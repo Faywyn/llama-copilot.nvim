@@ -32,6 +32,9 @@ local function create_window(buffer)
     border = "rounded",
   }
 
+  local f_type = vim.bo.filetype
+  vim.api.nvim_buf_set_option(buffer, 'filetype', f_type)
+
   M.float_win = vim.api.nvim_open_win(buffer, true, opts)
 end
 
@@ -63,8 +66,6 @@ local function request(prompt)
       .. "'{\"model\": \"" .. M.config.model
       .. "\",\"prompt\":\"" .. prompt .. "\",\"stream\": true}'"
 
-  local f_type = vim.bo.filetype
-  vim.api.nvim_buf_set_option(res_buff, 'filetype', f_type)
 
   res_txt = ""
   vim.api.nvim_buf_set_lines(res_buff, 0, -1, true, {}) -- Clear

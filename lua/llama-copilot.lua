@@ -4,7 +4,6 @@ local M = {}
 local default_config = {
   host = "localhost",
   port = "11434",
-  debug = true,
   model = "codellama:7b-code"
 }
 M.config = {}
@@ -14,7 +13,6 @@ M.setup = function(conf) for k, v in pairs(conf) do M.config[k] = v end end
 -- Config --
 
 -- Buffers
-local input_buff = vim.api.nvim_create_buf(false, true)
 local res_buff = vim.api.nvim_create_buf(false, true)
 local res_txt = ""
 

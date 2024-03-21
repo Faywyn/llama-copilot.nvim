@@ -1,6 +1,5 @@
 # llama-copilot.nvim
 
---
 This project has a simple goal, to use ollama llms for code completion.
 
 ## Installation & setup

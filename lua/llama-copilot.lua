@@ -52,7 +52,7 @@ local function on_update(_, data)
     if (res == "\n") then
       res = ""
     end
-    if (res ~= nil) then
+    if (res == nil) then
       res = ""
     end
     res_txt = res_txt .. res

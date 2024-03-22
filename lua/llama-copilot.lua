@@ -86,6 +86,7 @@ local function generate_code()
       :gsub("\"", "\\\"")
       :gsub("\n", "\\n")
       :gsub("\t", "\\t")
+      :gsub("\\", "\\\\")
 
   create_window(res_buff)
   request(prompt)

@@ -23,6 +23,7 @@ Initially for [codellama:7b-code](https://ollama.com/library/codellama:7b-code) 
 ## Example
 <div align="center">
   <p>https://github.com/Faywynnn/llama-copilot.nvim/assets/63558304/116c126c-c20f-4537-b95a-76255f2a10a9</p>
+  Video speed: x4
 </div>
 
 

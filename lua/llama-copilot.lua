@@ -49,13 +49,13 @@ local function on_update(_, data)
   -- Get response data and add to buffer
   if (data[1] ~= "") then
     local res = vim.json.decode(data[1]).response
-    if (res == "\n") then
-      res = ""
-    end
     if (res == nil) then
       res = ""
     end
     res_txt = res_txt .. res
+    if (res_txt == "\n") then
+      res_txt = ""
+    end
     if (res_txt ~= "") then
       res_txt = res_txt:gsub("```", "")
       vim.api.nvim_buf_set_lines(res_buff, 0, -1, true, vim.split(res_txt, "\n"))
@@ -86,7 +86,6 @@ local function generate_code()
       :gsub("\"", "\\\"")
       :gsub("\n", "\\n")
       :gsub("\t", "\\t")
-      :gsub("\\", "\\\\")
 
   create_window(res_buff)
   request(prompt)

@@ -18,12 +18,11 @@ require('llama-copilot').setup({
 
 ## Requirement
 Need [ollama](https://ollama.com/) and any llm model.
-Initially for [codellama:7b-code](https://ollama.com/library/codellama:7b-code) and
-[13b](https://ollama.com/library/codellama:13b-code) to [70b](https://ollama.com/library/codellama:70b-code)
+Initially for [codellama:7b-code](https://ollama.com/library/codellama:7b-code) and up to [70b](https://ollama.com/library/codellama:70b-code)
 
 ## Example
 <div align="center">
-  <p>https://github.com/Faywynnn/llama-copilot.nvim/assets/63558304/ac7825e7-0136-47a4-b7a3-91dae47101d2</p>
+  <p>https://github.com/Faywynnn/llama-copilot.nvim/assets/63558304/116c126c-c20f-4537-b95a-76255f2a10a9</p>
 </div>
 
 

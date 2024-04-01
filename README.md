@@ -18,7 +18,7 @@ require('llama-copilot').setup({
 
 ## Requirement
 Need [ollama](https://ollama.com/) and any model.
-Initially for [codellama:7b-code](https://ollama.com/library/codellama:7b-code) and up to [70b](https://ollama.com/library/codellama:70b-code)
+Initially for [codellama:7b-code](https://ollama.com/library/codellama:7b-code) (and up to [70b](https://ollama.com/library/codellama:70b-code))
 
 ## Usage
 llama-copilot provides a user command ``:LlamaCopilot`` that can be used to trigger code generation based on the current context. Here's how you can use it:

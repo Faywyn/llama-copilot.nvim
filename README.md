@@ -17,7 +17,7 @@ require('llama-copilot').setup({
 ```
 
 > [!IMPORTANT]\
-> There might be problems caused by invalid characters (tabs, quotes, ...)
+> There might be problems caused by invalid characters (tabs, quotes, ...). If you want to edit the [code](https://github.com/Faywyn/llama-copilot.nvim/blob/274a8f747799b4ac94919dbcb92a42626cad8f8b/lua/llama-copilot.lua#L85)
 
 ## Requirement
 Need [ollama](https://ollama.com/) and any llm model.

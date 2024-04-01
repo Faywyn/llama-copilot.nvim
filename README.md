@@ -16,6 +16,9 @@ require('llama-copilot').setup({
 })
 ```
 
+> [!IMPORTANT]\
+> There might be problems caused by invalid characters (tabs, quotes, ...)
+
 ## Requirement
 Need [ollama](https://ollama.com/) and any llm model.
 Initially for [codellama:7b-code](https://ollama.com/library/codellama:7b-code) and up to [70b](https://ollama.com/library/codellama:70b-code)

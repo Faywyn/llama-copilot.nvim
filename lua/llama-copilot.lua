@@ -16,6 +16,16 @@ M.setup = function(conf) for k, v in pairs(conf) do M.config[k] = v end end
 local res_buff = vim.api.nvim_create_buf(false, true)
 local res_txt = ""
 
+-- Check requirement
+local function check_plugins()
+  local ok, _ = pcall(require, "plenary")
+  if not ok then
+    print "[LlamaCopilot] You need to install the plenary.nvim plugin"
+    return false
+  end
+  return true
+end
+
 -- Create floating window with buffer
 local function create_window(buffer)
   -- Get new window size
@@ -113,9 +123,17 @@ local function generate_code()
   local prompt = table.concat(lines_arr, "\n")
 
   create_window(res_buff)
-  request(prompt)
+
+  if (check_plugins()) then
+    request(prompt)
+  else
+    vim.api.nvim_buf_set_lines(res_buff, 0, -1, true,
+      vim.split("[LlamaCopilot] You need to install the plenary.nvim plugin", "\n")
+    )
+  end
 end
 
 vim.api.nvim_create_user_command("LlamaCopilot", generate_code, {})
+check_plugins()
 
 return M

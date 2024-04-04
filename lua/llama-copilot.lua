@@ -40,40 +40,68 @@ end
 
 
 -- Add data response to res_buff
-local function on_update(_, data)
-  -- Check if window still open
-  if not M.float_win or not vim.api.nvim_win_is_valid(M.float_win) then
-    if M.jobid then vim.fn.jobstop(M.jobid) end
+local function on_update(chunk, job)
+  local _, body = pcall(function()
+    return vim.json.decode(chunk)
+  end)
+
+  local res
+
+  if (body == nil or body.response == nil) then
+    res = ""
+  else
+    res = body.response
   end
 
-  -- Get response data and add to buffer
-  if (data[1] ~= "") then
-    local res = vim.json.decode(data[1]).response
-    if (res == nil) then
-      res = ""
-    end
-    res_txt = res_txt .. res
-    if (res_txt == "\n") then
-      res_txt = ""
-    end
-    if (res_txt ~= "") then
-      res_txt = res_txt:gsub("```", "")
-      vim.api.nvim_buf_set_lines(res_buff, 0, -1, true, vim.split(res_txt, "\n"))
-    end
+  -- Check if window still open
+  if (not M.float_win or not vim.api.nvim_win_is_valid(M.float_win)) and M.running then
+    M.running = false
+    io.popen("kill " .. job.pid)
+    return
+  end
+
+  -- Add to buffer
+  res_txt = res_txt .. res
+  res_txt = res_txt:gsub("```", "")
+  if (res_txt == "\n") then
+    res_txt = ""
+  end
+  if (res_txt ~= "") then
+    vim.api.nvim_buf_set_lines(res_buff, 0, -1, true, vim.split(res_txt, "\n"))
   end
 end
 
--- Ask llm with prompt
-local function request(prompt)
-  local cmd = "curl --silent --no-buffer -X POST http://"
-      .. M.config.host .. ":" .. M.config.port .. "/api/generate -d "
-      .. "'{\"model\": \"" .. M.config.model
-      .. "\",\"prompt\":\"" .. prompt .. "\",\"stream\": true}'"
-
-
+-- Reset buffer
+local function reset_buffer()
   res_txt = ""
-  vim.api.nvim_buf_set_lines(res_buff, 0, -1, true, {}) -- Clear
-  M.jobid = vim.fn.jobstart(cmd, { on_stdout = on_update })
+  local default_text = "Loading ...\n\n"
+      .. "----------\n"
+      .. "Here is some information about the plugin:\n"
+      .. "  - Exiting this window will stop the process\n"
+      .. "  - In order to add the completed code, copy and paste it !"
+  vim.api.nvim_buf_set_lines(res_buff, 0, -1, true, vim.split(default_text, "\n")) -- Clear
+end
+
+-- Ask ollama
+local function request(prompt)
+  reset_buffer()
+  M.running = true
+
+  local adress = "http://" .. M.config.host .. ":" .. M.config.port .. "/api/generate"
+  require("plenary.curl").post(adress, {
+    body = vim.json.encode({
+      model = M.config.model,
+      prompt = prompt,
+      stream = true,
+    }),
+    stream = function(_, chunk, job)
+      vim.schedule(function()
+        if (M.running) then
+          on_update(chunk, job)
+        end
+      end)
+    end,
+  })
 end
 
 -- Start code completion
@@ -83,9 +111,6 @@ local function generate_code()
   local lines_arr = vim.api.nvim_buf_get_lines(0, 0, line, false)
 
   local prompt = table.concat(lines_arr, "\n")
-      :gsub("\"", "\\\"")
-      :gsub("\n", "\\n")
-      :gsub("\t", "\\t")
 
   create_window(res_buff)
   request(prompt)

@@ -7,7 +7,7 @@ local default_config = {
   host = "localhost",
   port = "11434",
   model = "codellama:7b-code",
-  max_completion_size = -1 -- use -1 for limitless
+  max_completion_size = 15 -- use -1 for limitless
 }
 M.config = {}
 for k, v in pairs(default_config) do M.config[k] = v end

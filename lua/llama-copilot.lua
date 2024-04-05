@@ -32,6 +32,7 @@ local function on_update(chunk, job)
     res = body.response
   end
 
+
   -- Check if window still open
   vim.schedule(function()
     if (not M.float_win or not vim.api.nvim_win_is_valid(M.float_win)) and M.running then
@@ -96,3 +97,32 @@ local function generate_code()
   M.line = vim.api.nvim_win_get_cursor(0)[1]
   local lines_arr = vim.api.nvim_buf_get_lines(0, 0, M.line, false)
 
+  local prompt = table.concat(lines_arr, "\n")
+
+  M.float_win = Create_Compl_Window(M.res_buff, M.config.max_completion_size)
+
+  if (Check_Plugins()) then
+    request(prompt)
+  else
+    vim.api.nvim_buf_set_lines(M.res_buff, 0, -1, true,
+      vim.split("[LlamaCopilot] You need to install the plenary.nvim plugin", "\n")
+    )
+  end
+end
+
+-- Accept code
+local function accept_code()
+  -- Add M.res_buf content to current buffer
+
+  if (M.float_win) then
+    vim.api.nvim_win_close(M.float_win, true)
+  end
+
+  Append_to_buffe_line(0, M.res_txt, M.line)
+end
+
+vim.api.nvim_create_user_command("LlamaCopilotComplet", generate_code, {})
+vim.api.nvim_create_user_command("LlamaCopilotAccept", accept_code, {})
+Check_Plugins()
+
+return M

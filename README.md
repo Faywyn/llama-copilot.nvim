@@ -19,7 +19,8 @@ Calling the setup function is not required, it is necessary if you want to use o
 require('llama-copilot').setup({
   host = "localhost",
   port = "11434",
-  model = "codellama:7b-code"
+  model = "codellama:7b-code",
+  max_completion_size = 15 -- use -1 for limitless
 })
 ```
 
@@ -30,12 +31,13 @@ require('llama-copilot').setup({
 > Initially for [codellama:7b-code](https://ollama.com/library/codellama:7b-code) (and up to [70b](https://ollama.com/library/codellama:70b-code)). It hasn't been tested with other llm model.
 
 ## Usage
-llama-copilot provides a user command ``:LlamaCopilot`` that can be used to trigger code generation based on the current context. Here's how you can use it:
+llama-copilot provides user commands ``:LlamaCopilotComplet`` and ``:LlamaCopilotAccept`` that can be used to trigger code generation (based on the current context) and accept the code.
+Here's how you can use it:
 
 1. Position your cursor where you want to generate code.
-2. Type ``:LlamaCopilot`` and press Enter.
-
-This will trigger the plugin to send a request to ollama's API with the current context as a prompt. The AI model will then generate code based on the prompt and display the generated code in a floating window.
+2. Type ``:LlamaCopilotAccept`` and press Enter.
+3. Wait for the code to generate
+4. Type ``:LlamaCopilotAccept`` to place the completion on your file or ``:q`` to quit the open window
 
 ## Example
 <div align="center">

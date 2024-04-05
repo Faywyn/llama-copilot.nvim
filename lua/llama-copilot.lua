@@ -45,7 +45,6 @@ local function on_update(chunk, job)
 
   -- Check max line
   local line_count = #vim.split(M.res_txt, "\n")
-  print(line_count)
   if (M.config.max_completion_size ~= -1 and M.config.max_completion_size <= line_count and M.running) then
     M.running = false
     io.popen("kill " .. job.pid)

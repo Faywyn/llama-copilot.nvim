@@ -41,6 +41,6 @@ Here's how you can use it:
 
 ## Example
 <div align="center">
-  <p>https://github.com/Faywyn/llama-copilot.nvim/assets/63558304/116c126c-c20f-4537-b95a-76255f2a10a9</p>
-  Video speed: x4
+  <p>https://github.com/Faywyn/llama-copilot.nvim/assets/63558304/119eb883-cbbd-4efe-90e5-ea181e9be44b</p>
+  Video speed: x6  |  LLM: codellama:12b-code
 </div>

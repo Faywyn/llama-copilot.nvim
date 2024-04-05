@@ -32,9 +32,6 @@ local function on_update(chunk, job)
     res = body.response
   end
 
-
-  print(res)
-
   -- Check if window still open
   vim.schedule(function()
     if (not M.float_win or not vim.api.nvim_win_is_valid(M.float_win)) and M.running then

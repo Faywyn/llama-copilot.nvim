@@ -1,55 +1,24 @@
+require("utils")
+
 local M = {}
 
 -- Config --
 local default_config = {
   host = "localhost",
   port = "11434",
-  model = "codellama:7b-code"
+  model = "codellama:7b-code",
+  max_completion_size = 15 -- use -1 for limitless
 }
 M.config = {}
 for k, v in pairs(default_config) do M.config[k] = v end
 
 M.setup = function(conf) for k, v in pairs(conf) do M.config[k] = v end end
--- Config --
-
--- Buffers
-local res_buff = vim.api.nvim_create_buf(false, true)
-local res_txt = ""
-
--- Check requirement
-local function check_plugins()
-  local ok, _ = pcall(require, "plenary")
-  if not ok then
-    print "[LlamaCopilot] You need to install the plenary.nvim plugin"
-    return false
-  end
-  return true
-end
-
--- Create floating window with buffer
-local function create_window(buffer)
-  -- Get new window size
-  local width = math.floor(vim.o.columns * 0.8)
-  local height = math.floor(vim.o.lines * 0.5)
-  local posX = math.floor((vim.o.columns - width) / 2)
-
-  local opts = {
-    relative = 'editor',
-    row = 3,
-    col = posX,
-    width = width,
-    height = height,
-    border = "rounded",
-  }
-
-  local f_type = vim.bo.filetype
-  vim.api.nvim_buf_set_option(buffer, 'filetype', f_type)
-
-  M.float_win = vim.api.nvim_open_win(buffer, true, opts)
-end
+M.res_buff = vim.api.nvim_create_buf(false, true)
+M.res_txt = ""
+M.line = 0
 
 
--- Add data response to res_buff
+-- Add data response to M.res_buff
 local function on_update(chunk, job)
   local _, body = pcall(function()
     return vim.json.decode(chunk)
@@ -70,26 +39,33 @@ local function on_update(chunk, job)
     return
   end
 
-  -- Add to buffer
-  res_txt = res_txt .. res
-  res_txt = res_txt:gsub("```", "")
-  if (res_txt == "\n") then
-    res_txt = ""
+
+  M.res_txt = M.res_txt .. res
+  M.res_txt = M.res_txt:gsub("```", "")
+
+  -- Check max line
+  local line_count = #vim.split(M.res_txt, "\n")
+  print(line_count)
+  if (M.config.max_completion_size ~= -1 and M.config.max_completion_size <= line_count and M.running) then
+    M.running = false
+    io.popen("kill " .. job.pid)
   end
-  if (res_txt ~= "") then
-    vim.api.nvim_buf_set_lines(res_buff, 0, -1, true, vim.split(res_txt, "\n"))
+
+
+  -- Add to buffer
+  if (M.res_txt == "\n") then
+    M.res_txt = ""
+  end
+  if (M.res_txt ~= "") then
+    local table_res = Reduce_Array(vim.split(M.res_txt, "\n"), M.config.max_completion_size)
+    Append_to_buffer(M.res_buff, res)
   end
 end
 
 -- Reset buffer
 local function reset_buffer()
-  res_txt = ""
-  local default_text = "Loading ...\n\n"
-      .. "----------\n"
-      .. "Here is some information about the plugin:\n"
-      .. "  - Exiting this window will stop the process\n"
-      .. "  - In order to add the completed code, copy and paste it !"
-  vim.api.nvim_buf_set_lines(res_buff, 0, -1, true, vim.split(default_text, "\n")) -- Clear
+  M.res_txt = ""
+  vim.api.nvim_buf_set_lines(M.res_buff, 0, -1, true, {})
 end
 
 -- Ask ollama
@@ -117,23 +93,35 @@ end
 -- Start code completion
 local function generate_code()
   -- Get above code
-  local line = vim.api.nvim_win_get_cursor(0)[1]
-  local lines_arr = vim.api.nvim_buf_get_lines(0, 0, line, false)
+  M.line = vim.api.nvim_win_get_cursor(0)[1]
+  local lines_arr = vim.api.nvim_buf_get_lines(0, 0, M.line, false)
 
   local prompt = table.concat(lines_arr, "\n")
 
-  create_window(res_buff)
+  M.float_win = Create_Compl_Window(M.res_buff, M.config.max_completion_size)
 
-  if (check_plugins()) then
+  if (Check_Plugins()) then
     request(prompt)
   else
-    vim.api.nvim_buf_set_lines(res_buff, 0, -1, true,
+    vim.api.nvim_buf_set_lines(M.res_buff, 0, -1, true,
       vim.split("[LlamaCopilot] You need to install the plenary.nvim plugin", "\n")
     )
   end
 end
 
-vim.api.nvim_create_user_command("LlamaCopilot", generate_code, {})
-check_plugins()
+-- Accept code
+local function accept_code()
+  -- Add M.res_buf content to current buffer
+
+  if (M.float_win) then
+    vim.api.nvim_win_close(M.float_win, true)
+  end
+
+  Append_to_buffe_line(0, M.res_txt, M.line)
+end
+
+vim.api.nvim_create_user_command("LlamaCopilotComplet", generate_code, {})
+vim.api.nvim_create_user_command("LlamaCopilotAccept", accept_code, {})
+Check_Plugins()
 
 return M

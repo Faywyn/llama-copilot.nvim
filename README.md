@@ -35,7 +35,7 @@ llama-copilot provides user commands ``:LlamaCopilotComplet`` and ``:LlamaCopilo
 Here's how you can use it:
 
 1. Position your cursor where you want to generate code.
-2. Type ``:LlamaCopilotAccept`` and press Enter.
+2. Type ``:LlamaCopilotComplet`` and press Enter.
 3. Wait for the code to generate
 4. Type ``:LlamaCopilotAccept`` to place the completion on your file or ``:q`` to quit the open window
 
